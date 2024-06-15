@@ -10,7 +10,7 @@ Write a bash script that lists all files in the current directory.
 Write a bash script that reads a file and prints its content to the terminal. The filename should be provided as an argument.
 
 ## Task 4: Use `sed` to Replace Text in a File
-Write a bash script that uses `sed` to replace all occurrences of the word "foo" with "bar" in a file. The filename should be provided as an argument.
+Write a bash script that uses `sed` to replace all occurrences of the second argument with the third in a file. The filename, the word to be replaced, and the replacing word should be provided as an argument.
 
 ## Task 5: Fetch JSON Data with `curl` and Parse with `jq`
 Write a bash script that fetches JSON data from a given URL and extracts a specific field using `jq`. The URL and field name should be provided as arguments.
