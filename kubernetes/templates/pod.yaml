@@ -1,0 +1,17 @@
+# Define a Kubernetes Pod resource for MongoDB.
+# This Pod runs a single container using the MongoDB image.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mongo  # Specify the name of the Pod
+  labels:
+    app: mongo  # Assign labels to the Pod for identification purposes
+spec:
+  # Define the specification of the Pod
+  containers:
+    - name: mongo  # Specify the name of the container within the Pod
+      image: mongo  # Specify the Docker image to use for the container
+      ports:
+        - containerPort: 27017  # Expose port 27017 on the container for MongoDB
+          # Note: This port must match the port MongoDB is listening on inside the container

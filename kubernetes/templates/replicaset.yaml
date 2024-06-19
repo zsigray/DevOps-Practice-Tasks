@@ -1,0 +1,24 @@
+# Define a Kubernetes ReplicaSet resource for the frontend tier of the Guestbook application.
+# This ReplicaSet manages three replicas of a container running the php-redis image.
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend  # Specify the name of the ReplicaSet
+  labels:
+    app: guestbook  # Assign labels to the ReplicaSet for identification purposes
+    tier: frontend  # Additional label indicating the tier of the application
+spec:
+  # Define the specification of the ReplicaSet
+  replicas: 3  # Number of desired replicas (adjust according to your requirements)
+  selector:
+    matchLabels:
+      tier: frontend  # Selector to match pods controlled by this ReplicaSet
+  template:
+    metadata:
+      labels:
+        tier: frontend  # Labels applied to pods created by this ReplicaSet
+    spec:
+      containers:
+        - name: php-redis  # Name of the container within the Pod template
+          image: gcr.io/google_samples/gb-frontend:v3  # Docker image to use for the container

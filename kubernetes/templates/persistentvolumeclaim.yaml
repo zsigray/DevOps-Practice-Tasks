@@ -1,0 +1,12 @@
+# Define a Kubernetes PersistentVolumeClaim resource named foo-pvc.
+# This PersistentVolumeClaim requests storage from a PersistentVolume named foo-pv in the foo namespace.
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: foo-pvc  # Specify the name of the PersistentVolumeClaim
+  namespace: foo  # Namespace where the PersistentVolumeClaim resides
+spec:
+  storageClassName: ""  # Storage class name for dynamic provisioning (empty string means no class)
+  volumeName: foo-pv  # Name of the PersistentVolume to bind the claim to
+  # Add additional spec attributes as needed for your storage requirements

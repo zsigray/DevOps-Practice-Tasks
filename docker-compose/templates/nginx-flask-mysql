@@ -1,0 +1,106 @@
+# Define the services that make up our application
+services:
+  
+  # MariaDB (or MySQL) database service
+  db:
+    # Use the MariaDB 10 image from Docker Hub
+    image: mariadb:10-focal
+    # If you prefer MySQL, uncomment the line below and comment out the MariaDB image line
+    #image: mysql:8
+
+    # Command to set the default authentication plugin for MySQL/MariaDB
+    command: '--default-authentication-plugin=mysql_native_password'
+
+    # Always restart the container if it stops
+    restart: always
+
+    # Healthcheck configuration to verify database availability
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 --password="$$(cat /run/secrets/db-password)" --silent']
+      interval: 3s  # Check every 3 seconds
+      retries: 5    # Retry 5 times before considering the service as unhealthy
+      start_period: 30s  # Wait 30 seconds before starting the healthchecks
+
+    # Mount the db-data volume to persist database files
+    volumes:
+      - db-data:/var/lib/mysql
+
+    # Connect the service to the backnet network for backend communication
+    networks:
+      - backnet
+
+    # Environment variables for database configuration
+    environment:
+      - MYSQL_DATABASE=example  # Create a database named 'example'
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-password  # Read root password from the 'db-password' secret
+
+    # Expose MySQL/MariaDB ports for internal communication
+    expose:
+      - 3306  # MySQL/MariaDB default port
+      - 33060  # MySQL/MariaDB X Protocol port
+
+    # Define the secret used to store the database password
+    secrets:
+      - db-password
+
+  # Backend service
+  backend:
+    # Build the backend service using the Dockerfile in the 'backend' directory
+    build:
+      context: backend  # Directory containing the Dockerfile for backend service
+      target: builder   # Use the 'builder' stage from the Dockerfile
+
+    # Always restart the container if it stops
+    restart: always
+
+    # Connect the service to both backnet and frontnet networks
+    networks:
+      - backnet  # Backend network for internal communication
+      - frontnet # Frontend network for external access
+
+    # Define the port mappings for the backend service
+    ports:
+      - 8000:8000  # Map port 8000 of the host to port 8000 of the container
+
+    # Dependence on the db service with health check condition
+    depends_on:
+      db:
+        condition: service_healthy  # Wait until the 'db' service is healthy before starting
+
+    # Define the secret used to access the database password
+    secrets:
+      - db-password
+
+  # Proxy service (assumed to be a reverse proxy)
+  proxy:
+    # Build the proxy service using the Dockerfile in the 'proxy' directory
+    build: proxy
+
+    # Always restart the container if it stops
+    restart: always
+
+    # Map port 80 of the host to port 80 of the container
+    ports:
+      - 80:80
+
+    # Dependence on the backend service
+    depends_on: 
+      - backend
+
+    # Connect the service to the frontnet network for external access
+    networks:
+      - frontnet
+
+# Define named volumes for persistent storage of database data
+volumes:
+  db-data:
+
+# Define secrets used in the services
+secrets:
+  db-password:
+    file: db/password.txt  # Secret file containing the database root password
+
+# Define custom networks for service communication
+networks:
+  backnet:  # Backend network for internal service communication
+  frontnet: # Frontend network for external service access

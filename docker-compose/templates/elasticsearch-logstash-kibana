@@ -1,0 +1,92 @@
+# Define the services that make up our application
+services:
+  
+  # Elasticsearch service
+  elasticsearch:
+    # Use the official Elasticsearch image from Docker Hub
+    image: elasticsearch:7.16.1
+
+    # Set a custom container name
+    container_name: es
+
+    # Environment variables for Elasticsearch configuration
+    environment:
+      discovery.type: single-node  # Set Elasticsearch to run in single-node mode
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"  # Java heap size options for Elasticsearch
+
+    # Expose ports for Elasticsearch communication
+    ports:
+      - "9200:9200"  # HTTP port
+      - "9300:9300"  # TCP transport port
+
+    # Healthcheck configuration for Elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]  # Health check command
+      interval: 10s  # Check interval
+      timeout: 10s   # Timeout for each check
+      retries: 3     # Number of retries before considering the service as unhealthy
+
+    # Define the network for communication
+    networks:
+      - elastic
+
+  # Logstash service
+  logstash:
+    # Use the official Logstash image from Docker Hub
+    image: logstash:7.16.1
+
+    # Set a custom container name
+    container_name: log
+
+    # Environment variables for Logstash configuration
+    environment:
+      discovery.seed_hosts: logstash  # Seed host for Logstash discovery
+      LS_JAVA_OPTS: "-Xms512m -Xmx512m"  # Java heap size options for Logstash
+
+    # Mount volumes for Logstash configuration and logs
+    volumes:
+      - ./logstash/pipeline/logstash-nginx.config:/usr/share/logstash/pipeline/logstash-nginx.config  # Logstash pipeline configuration
+      - ./logstash/nginx.log:/home/nginx.log  # Nginx log file
+
+    # Expose ports for Logstash input and monitoring
+    ports:
+      - "5000:5000/tcp"  # TCP input port
+      - "5000:5000/udp"  # UDP input port
+      - "5044:5044"      # Beats input port
+      - "9600:9600"      # Logstash monitoring port
+
+    # Dependence on Elasticsearch service
+    depends_on:
+      - elasticsearch
+
+    # Define the network for communication
+    networks:
+      - elastic
+
+    # Command to start Logstash with the specified configuration file
+    command: logstash -f /usr/share/logstash/pipeline/logstash-nginx.config
+
+  # Kibana service
+  kibana:
+    # Use the official Kibana image from Docker Hub
+    image: kibana:7.16.1
+
+    # Set a custom container name
+    container_name: kib
+
+    # Expose port for Kibana web interface
+    ports:
+      - "5601:5601"
+
+    # Dependence on Elasticsearch service
+    depends_on:
+      - elasticsearch
+
+    # Define the network for communication
+    networks:
+      - elastic
+
+# Define a custom network for the Elasticsearch, Logstash, and Kibana services to communicate
+networks:
+  elastic:
+    driver: bridge  # Use the bridge driver for the network

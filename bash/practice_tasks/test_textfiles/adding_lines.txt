@@ -1,4 +1,0 @@
-This is a new added line.
-This is a second added line.
-This is a third added line.
-This is a fourth added line.

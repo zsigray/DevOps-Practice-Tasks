@@ -1,0 +1,47 @@
+# Define a Kubernetes DaemonSet resource for fluentd-elasticsearch.
+# This DaemonSet ensures that a fluentd-elasticsearch container runs on each node in the cluster.
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd-elasticsearch  # Specify the name of the DaemonSet
+  namespace: kube-system  # Deploy the DaemonSet in the kube-system namespace
+  labels:
+    k8s-app: fluentd-logging  # Assign labels to the DaemonSet for identification purposes
+spec:
+  selector:
+    matchLabels:
+      name: fluentd-elasticsearch  # Selector to match nodes where fluentd-elasticsearch should run
+  template:
+    metadata:
+      labels:
+        name: fluentd-elasticsearch  # Labels applied to pods created by this DaemonSet
+    spec:
+      tolerations:
+        # Tolerate master node taints to allow DaemonSet to run on master nodes
+        # Remove if masters can't run pods
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      containers:
+        - name: fluentd-elasticsearch  # Name of the container within the Pod template
+          image: quay.io/fluentd_elasticsearch/fluentd:v2.5.2  # Docker image to use for the container
+          resources:
+            limits:
+              memory: 200Mi  # Memory limit for the container
+            requests:
+              cpu: 100m  # CPU request for the container
+              memory: 200Mi  # Memory request for the container
+          volumeMounts:
+            - name: varlog  # Name of the volume to mount
+              mountPath: /var/log  # Mount path in the container
+            - name: varlibdockercontainers  # Name of the volume to mount
+              mountPath: /var/lib/docker/containers  # Mount path in the container
+              readOnly: true  # Mount the volume read-only
+          terminationGracePeriodSeconds: 30  # Grace period for terminating the container
+      volumes:
+        - name: varlog  # Name of the volume
+          hostPath:
+            path: /var/log  # Host path to mount into the container
+        - name: varlibdockercontainers  # Name of the volume
+          hostPath:
+            path: /var/lib/docker/containers  # Host path to mount into the container

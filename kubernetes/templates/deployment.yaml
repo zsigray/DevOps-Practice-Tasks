@@ -1,0 +1,26 @@
+# Define a Kubernetes Deployment resource for an nginx application.
+# This Deployment manages three replicas of a container running nginx version 1.14.2.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment  # Specify the name of the Deployment
+  labels:
+    app: nginx  # Assign labels to the Deployment for identification purposes
+spec:
+  # Define the specification of the Deployment
+  replicas: 3  # Number of desired replicas (adjust according to your requirements)
+  selector:
+    matchLabels:
+      app: nginx  # Selector to match pods controlled by this Deployment
+  template:
+    metadata:
+      labels:
+        app: nginx  # Labels applied to pods created by this Deployment
+    spec:
+      containers:
+        - name: nginx  # Name of the container within the Pod template
+          image: nginx:1.14.2  # Docker image to use for the container (nginx version 1.14.2)
+          ports:
+            - containerPort: 80  # Expose port 80 on the container for nginx
+              # Note: Ensure that the containerPort matches the port nginx is listening on inside the container

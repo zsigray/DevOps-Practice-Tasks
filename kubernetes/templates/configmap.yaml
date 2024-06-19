@@ -1,0 +1,20 @@
+# Define a Kubernetes ConfigMap resource named game-demo.
+# This ConfigMap stores configuration data as key-value pairs and file content.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: game-demo  # Specify the name of the ConfigMap
+data:
+  # Property-like keys; each key maps to a simple value
+  player_initial_lives: "3"
+  ui_properties_file_name: "user-interface.properties"
+
+  # File-like keys with content using YAML multi-line string syntax
+  game.properties: |
+    enemy.types=aliens,monsters
+    player.maximum-lives=5
+  user-interface.properties: |
+    color.good=purple
+    color.bad=yellow
+    allow.textmode=true

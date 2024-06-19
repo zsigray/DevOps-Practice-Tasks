@@ -1,0 +1,20 @@
+
+
+# Use an official Perl runtime as a parent image
+FROM perl:5.32
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Install CPAN dependencies
+COPY cpanfile ./
+RUN cpanm --installdeps .
+
+# Copy the rest of the application code
+COPY . .
+
+# Expose the port the app runs on
+EXPOSE 3000
+
+# Run the Perl application
+CMD ["perl", "app.pl"]

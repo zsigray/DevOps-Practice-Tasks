@@ -1,0 +1,53 @@
+## Ref: https://www.javatpoint.com/docker-java-example
+
+FROM java:8  
+COPY . /var/www/java  
+WORKDIR /var/www/java  
+RUN javac Hello.java  
+CMD ["java", "Hello"]  
+
+## Ref: https://www.baeldung.com/java-dockerize-app
+
+FROM openjdk:17-jdk-alpine
+COPY target/docker-java-jar-0.0.1-SNAPSHOT.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
+
+## Ref: https://spring.io/guides/gs/spring-boot-docker
+# Spring - MORE examples
+
+FROM openjdk:8-jdk-alpine
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
+
+## Ref: https://devopscube.com/dockerize-java-application/
+
+FROM techiescamp/jre-17:1.0.0
+WORKDIR /app
+
+# Copy the JAR file (/app)
+COPY /target/*.jar ./java.jar
+
+# Expose the port the app runs on
+EXPOSE 8080
+
+# Run the jar file
+CMD ["java", "-jar", "java.jar"]
+
+
+### ANOTHER EXAMPLE
+
+# Use an official OpenJDK runtime as a parent image
+FROM openjdk:11-jre-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the application JAR file into the container
+COPY target/myapp.jar /app/myapp.jar
+
+# Expose the port the app runs on
+EXPOSE 8080
+
+# Run the application
+CMD ["java", "-jar", "myapp.jar"]

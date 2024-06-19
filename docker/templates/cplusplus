@@ -1,0 +1,23 @@
+# Use an official GCC image to build the application
+FROM gcc:latest AS builder
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the source code into the container
+COPY . .
+
+# Build the C++ application
+RUN g++ -o myapp main.cpp
+
+# Use a smaller base image for the final container
+FROM alpine:latest
+
+# Set the working directory in the container
+WORKDIR /root/
+
+# Copy the built C++ application from the builder stage
+COPY --from=builder /app/myapp .
+
+# Run the C++ application
+CMD ["./myapp"]

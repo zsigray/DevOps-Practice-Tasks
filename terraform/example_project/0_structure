@@ -1,0 +1,19 @@
+my-terraform-project/
+├── main.tf
+├── variables.tf
+├── outputs.tf
+├── terraform.tfvars
+└── backend.tf
+
+Explanation
+main.tf: Contains the resource definitions for the VPC, subnet, security group, EC2 instance, and S3 bucket.
+variables.tf: Defines the input variables used in the Terraform configuration.
+outputs.tf: Specifies the output values that will be displayed after the infrastructure is created.
+terraform.tfvars: Provides values for the input variables, allowing customization without modifying the main configuration files.
+backend.tf: Configures Terraform to use an S3 bucket for storing the Terraform state file remotely. This is useful for collaboration and maintaining state consistency.
+This example demonstrates how to structure a Terraform project with multiple files, making it easier to manage and maintain infrastructure as code.
+
+
+
+
+
